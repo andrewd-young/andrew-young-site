@@ -248,6 +248,10 @@ export default function App() {
               max="1439"
               step="1"
               value={minutes}
+              // The 16px thumb stops 8px from each end, so the fill follows its center.
+              style={
+                { '--fill': `calc(8px + (100% - 16px) * ${minutes / 1439})` } as React.CSSProperties
+              }
               onChange={(e) => setManual(Number(e.target.value))}
               aria-label="Time of day"
               aria-valuetext={`${timeLabel(minutes)}, ${phase}`}

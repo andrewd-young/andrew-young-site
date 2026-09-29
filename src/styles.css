@@ -319,7 +319,9 @@ footer a {
   margin-top: 14px;
 }
 
-/* Sky control: a small corner button that opens a time slider. */
+/* Sky control: a small corner button that opens a time slider.
+   One border on the pill, no shadows, no nested borders. The buttons get a light hover
+   background so they read as clickable; the slider has no hover state. */
 .sky-control {
   position: fixed;
   right: 24px;
@@ -333,62 +335,97 @@ footer a {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px;
-  box-shadow: 0 8px 40px #0002;
 }
-.day .sky-control {
-  box-shadow: 0 8px 40px #17344818;
-}
-.sky-toggle {
+.sky-control button {
   display: flex;
   align-items: center;
-  gap: 8px;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: inherit;
-  padding: 6px 12px;
+  color: var(--muted);
   cursor: pointer;
+  transition:
+    color 0.2s,
+    background 0.2s;
 }
-.sky-toggle:hover {
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+.sky-control button:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+.sky-control button:hover,
+.sky-control .live.active {
+  color: var(--ink);
+}
+.sky-control :focus-visible {
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+.sky-control .sky-toggle {
+  gap: 8px;
+  padding: 6px 12px;
+  color: var(--ink);
 }
 .sky-toggle output {
   font-size: 13px;
-  font-variant-numeric: tabular-nums;
 }
 .range-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   padding-left: 12px;
 }
-.range-row input {
-  width: 200px;
-  accent-color: var(--accent);
-  cursor: pointer;
-  height: 20px;
-  margin: 0;
-}
 .live {
-  display: flex;
   gap: 6px;
-  align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: transparent;
-  color: var(--muted);
-  padding: 4px 9px;
+  padding: 6px 8px;
   font-size: 12px;
-  cursor: pointer;
-}
-.live.active {
-  color: var(--ink);
 }
 .live span {
   height: 5px;
   width: 5px;
   background: currentColor;
   border-radius: 50%;
+}
+
+/* A plain slider: a 6px track filled up to the thumb, and no browser hover states.
+   App.tsx sets --fill to the thumb position. */
+.range-row input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 200px;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.range-row input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--ink) var(--fill), var(--line) var(--fill));
+}
+.range-row input::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+}
+.range-row input::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+.range-row input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.range-row input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
 }
 
 @media (min-width: 1600px) {
