@@ -58,7 +58,7 @@ a:hover { text-decoration: underline; text-underline-offset: 5px; }
 .veil { background: linear-gradient(#07101a22, #07101a00 45%, #07101a55); }
 .day .veil { background: #f2f6f538; }
 
-main { position: relative; max-width: 1600px; margin: auto; padding: 0 5.5% 200px; }
+main { position: relative; max-width: 1600px; margin: auto; padding: 0 5.5% 140px; }
 
 /* Masthead */
 .masthead { height: 114px; display: flex; align-items: center; gap: 30px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -124,24 +124,38 @@ nav { display: flex; gap: 30px; color: var(--accent); font-size: 15px; padding-b
 .preview-frame img.shown { opacity: 1; }
 .preview .meta { margin-top: 14px; }
 
-/* Sky control */
+/* Sky control: a small corner button that opens a time slider. */
 .sky-control {
   position: fixed;
+  right: 24px;
   bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 365px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: var(--glass);
   backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: 0 8px 50px #0002;
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 8px 40px #0002;
 }
-.day .sky-control { box-shadow: 0 8px 50px #17344818; }
-.range-row { display: flex; align-items: center; gap: 12px; font-size: 17px; }
-.range-row input { width: 100%; min-width: 0; accent-color: var(--accent); cursor: pointer; height: 20px; }
-.range-row output { font-family: var(--mono); font-size: 12px; }
+.day .sky-control { box-shadow: 0 8px 40px #17344818; }
+.sky-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.sky-toggle:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.sky-toggle output { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+.range-row { display: flex; align-items: center; gap: 10px; padding-left: 12px; }
+.range-row input { width: 200px; accent-color: var(--accent); cursor: pointer; height: 20px; margin: 0; }
 .live {
   display: flex;
   gap: 6px;
@@ -169,7 +183,7 @@ nav { display: flex; gap: 30px; color: var(--accent); font-size: 15px; padding-b
 }
 
 @media (max-width: 760px) {
-  main { padding: 0 6% 190px; }
+  main { padding: 0 6% 120px; }
   .masthead { height: 85px; gap: 15px; font-size: 10px; }
   .clock { margin-left: 8px; }
   .phase { display: none; }
@@ -190,7 +204,8 @@ nav { display: flex; gap: 30px; color: var(--accent); font-size: 15px; padding-b
   .expand { grid-column: 3; grid-row: 1; }
   .job-detail { padding: 5px 0 26px; }
   .job-detail ul { font-size: 14px; line-height: 1.7; }
-  .sky-control { width: min(365px, calc(100vw - 32px)); bottom: 16px; }
+  .sky-control { right: 16px; bottom: 16px; }
+  .range-row input { width: min(200px, calc(100vw - 210px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

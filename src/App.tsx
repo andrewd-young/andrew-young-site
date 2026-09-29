@@ -85,6 +85,7 @@ export default function App() {
   const [manual, setManual] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
+  const [controlOpen, setControlOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(sfMinutes()), 15000);
@@ -185,30 +186,38 @@ export default function App() {
         </section>
       </main>
 
-      <aside className="sky-control" aria-label="Sky time">
-        <div className="range-row">
-          <span aria-hidden="true">☾</span>
-          <input
-            id="sky-hour"
-            type="range"
-            min="0"
-            max="1439"
-            step="1"
-            value={minutes}
-            onChange={(e) => setManual(Number(e.target.value))}
-            aria-label="Time of day"
-            aria-valuetext={`${timeLabel(minutes)}, ${phase}`}
-          />
-          <span aria-hidden="true">☀</span>
+      <aside className={`sky-control ${controlOpen ? 'open' : ''}`} aria-label="Sky time">
+        {controlOpen && (
+          <div className="range-row">
+            <input
+              id="sky-hour"
+              type="range"
+              min="0"
+              max="1439"
+              step="1"
+              value={minutes}
+              onChange={(e) => setManual(Number(e.target.value))}
+              aria-label="Time of day"
+              aria-valuetext={`${timeLabel(minutes)}, ${phase}`}
+            />
+            <button
+              className={manual === null ? 'live active' : 'live'}
+              onClick={() => setManual(null)}
+              aria-pressed={manual === null}
+            >
+              <span />Live
+            </button>
+          </div>
+        )}
+        <button
+          className="sky-toggle"
+          onClick={() => setControlOpen(!controlOpen)}
+          aria-expanded={controlOpen}
+          aria-label={controlOpen ? 'Close sky time control' : 'Change sky time'}
+        >
+          <span aria-hidden="true">{light ? '☀' : '☾'}</span>
           <output htmlFor="sky-hour">{timeLabel(minutes)}</output>
-          <button
-            className={manual === null ? 'live active' : 'live'}
-            onClick={() => setManual(null)}
-            aria-pressed={manual === null}
-          >
-            <span />Live
-          </button>
-        </div>
+        </button>
       </aside>
     </div>
   );

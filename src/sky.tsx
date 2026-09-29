@@ -1,57 +1,139 @@
-import {useEffect,useRef} from 'react';
-const keys: [number,string,string,string,string,number][] = [
-    [0, '#03060c', '#0c1626', '#27303f', '#080c14', .45],
-    [5, '#070c1a', '#232a40', '#3a3f55', '#10141f', .55],
-    [6.5, '#3b4c6e', '#e6a88c', '#f4c8ae', '#6b6a82', .75],
-    [8.5, '#86a7c4', '#d6dfe4', '#f3f5f6', '#98a6b2', .9],
-    [12, '#4f88bf', '#b9d2e6', '#ffffff', '#b1c0cd', .3],
-    [16.5, '#6d93bd', '#e6d5ba', '#fff0da', '#a9a4aa', .45],
-    [19, '#2b3a63', '#e07c55', '#f2a67e', '#4a3e5a', .8],
-    [20.5, '#0d1428', '#3a3353', '#5a5272', '#141a2a', .6],
-    [24, '#03060c', '#0c1626', '#27303f', '#080c14', .45]
-  ];
+import { useEffect, useRef } from 'react';
 
-const hex=(h:string)=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
-function palette(h:number){let i=0;while(i<keys.length-2&&h>=keys[i+1][0])i++;const a=keys[i],b=keys[i+1],t=(h-a[0])/(b[0]-a[0]);const m=(j:1|2|3|4)=>hex(a[j]).map((v,n)=>v+(hex(b[j])[n]-v)*t);return {top:m(1),hor:m(2),lit:m(3),sh:m(4),fog:a[5]+(b[5]-a[5])*t}}
-export function Sky({hour}:{hour:number}){const ref=useRef<HTMLCanvasElement>(null);const hourRef=useRef(hour);hourRef.current=hour;
-useEffect(()=>{
-    const perm = new Uint8Array(512); const base = [...Array(256).keys()];
-    for (let i = 255; i > 0; i--) { const j = (i * 7919 + 13) % (i + 1); [base[i], base[j]] = [base[j], base[i]]; }
-    for (let i = 0; i < 512; i++) perm[i] = base[i & 255];
-    const rnd = (x:number, y:number) => perm[(perm[x & 255] + y) & 511] / 255;
-    const sm = (t:number) => t * t * (3 - 2 * t);
-    const noise = (x:number, y:number) => {
-      const xi = Math.floor(x), yi = Math.floor(y), xf = sm(x - xi), yf = sm(y - yi);
-      const a = rnd(xi, yi), b = rnd(xi + 1, yi), c = rnd(xi, yi + 1), d = rnd(xi + 1, yi + 1);
-      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+// [hour, sky top, horizon, lit cloud, shaded cloud, fog amount]
+type Key = [number, string, string, string, string, number];
+const keys: Key[] = [
+  [0, '#03060c', '#0c1626', '#27303f', '#080c14', 0.45],
+  [5, '#070c1a', '#232a40', '#3a3f55', '#10141f', 0.55],
+  [6.5, '#3b4c6e', '#e6a88c', '#f4c8ae', '#6b6a82', 0.75],
+  [8.5, '#86a7c4', '#d6dfe4', '#f3f5f6', '#98a6b2', 0.9],
+  [12, '#4f88bf', '#b9d2e6', '#ffffff', '#b1c0cd', 0.3],
+  [16.5, '#6d93bd', '#e6d5ba', '#fff0da', '#a9a4aa', 0.45],
+  [19, '#2b3a63', '#e07c55', '#f2a67e', '#4a3e5a', 0.8],
+  [20.5, '#0d1428', '#3a3353', '#5a5272', '#141a2a', 0.6],
+  [24, '#03060c', '#0c1626', '#27303f', '#080c14', 0.45],
+];
+
+const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+
+function palette(h: number) {
+  let i = 0;
+  while (i < keys.length - 2 && h >= keys[i + 1][0]) i++;
+  const a = keys[i];
+  const b = keys[i + 1];
+  const t = (h - a[0]) / (b[0] - a[0]);
+  const mix = (j: 1 | 2 | 3 | 4) => rgb(a[j]).map((v, n) => v + (rgb(b[j])[n] - v) * t);
+  return { top: mix(1), hor: mix(2), lit: mix(3), sh: mix(4), fog: a[5] + (b[5] - a[5]) * t };
+}
+
+const vertex = `
+attribute vec2 p;
+void main() { gl_Position = vec4(p, 0.0, 1.0); }`;
+
+// Drifting value-noise clouds over a vertical sky gradient, with fog near the horizon.
+const fragment = `
+precision mediump float;
+uniform vec2 res;
+uniform float time;
+uniform vec3 top, hor, lit, sh;
+uniform float fog;
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0, a = 0.5;
+  for (int o = 0; o < 5; o++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
+  return v;
+}
+void main() {
+  vec2 uv = gl_FragCoord.xy / res;
+  float yn = 1.0 - uv.y;
+  vec2 q = vec2(uv.x * res.x / res.y * 4.7, yn * 7.3) + vec2(time * 0.035, time * 0.006);
+  float fogBand = fog * max(0.0, (yn - 0.45) / 0.55) * 0.55;
+  float n = fbm(q) + fogBand * (0.7 + 0.3 * noise(q * 1.8 - vec2(time * 0.05, 0.0)));
+  float d = smoothstep(0.0, 1.0, clamp((n - (0.6 - fog * 0.12)) / 0.26, 0.0, 1.0));
+  float shade = clamp((fbm(q + vec2(0.35, 0.5)) - 0.35) * 1.6 + yn * 0.3, 0.0, 1.0);
+  vec3 sky = mix(top, hor, pow(yn, 0.85));
+  vec3 cloud = mix(lit, sh, shade);
+  gl_FragColor = vec4(mix(sky, cloud, d * 0.96), 1.0);
+}`;
+
+export function Sky({ hour }: { hour: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const target = useRef(hour);
+  target.current = hour;
+
+  useEffect(() => {
+    const canvas = ref.current!;
+    const gl = canvas.getContext('webgl', { antialias: false });
+    if (!gl) return;
+
+    const shader = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
     };
-    const fbm = (x:number, y:number) => { let v = 0, amp = .5, f = 1; for (let o = 0; o < 5; o++) { v += amp * noise(x * f, y * f); f *= 2.03; amp *= .5; } return v; };
+    const program = gl.createProgram()!;
+    gl.attachShader(program, shader(gl.VERTEX_SHADER, vertex));
+    gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fragment));
+    gl.bindAttribLocation(program, 0, 'p');
+    gl.linkProgram(program);
+    gl.useProgram(program);
 
-let frame=0,last=0;const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-const draw=(ts:number)=>{frame=requestAnimationFrame(draw);if(ts-last<(reduced.matches?1000:80))return;last=ts;const cv=ref.current;if(!cv)return;
-      const ctx = cv.getContext('2d')!; const W = cv.width, H = cv.height;
-      const img = ctx.createImageData(W, H), px = img.data;
-      const P = palette(hourRef.current), t = reduced.matches ? 0 : ts / 1000;
-      const cover = .6 - P.fog * .12;
-      for (let y = 0; y < H; y++) {
-        const yn = y / H, skyT = Math.pow(yn, .85);
-        const fogB = P.fog * Math.max(0, (yn - .45) / .55) * .55;
-        for (let x = 0; x < W; x++) {
-          const nx = x / 34 + t * .035, ny = y / 22 + t * .006;
-          const n = fbm(nx, ny) + fogB * (.7 + .3 * noise(x / 18 - t * .05, y / 12));
-          let d = (n - cover) / .26; d = d < 0 ? 0 : d > 1 ? 1 : d; d = d * d * (3 - 2 * d);
-          const shade = Math.min(1, Math.max(0, (fbm(nx + .35, ny + .5) - .35) * 1.6 + yn * .3));
-          const i = (y * W + x) * 4;
-          for (let c = 0; c < 3; c++) {
-            const sky = P.top[c] + (P.hor[c] - P.top[c]) * skyT;
-            const cl = P.lit[c] + (P.sh[c] - P.lit[c]) * shade;
-            px[i + c] = sky + (cl - sky) * d * .96;
-          }
-          px[i + 3] = 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    const u = (name: string) => gl.getUniformLocation(program, name);
+    const [uRes, uTime, uTop, uHor, uLit, uSh, uFog] =
+      ['res', 'time', 'top', 'hor', 'lit', 'sh', 'fog'].map(u);
+
+    // The sky is blurred, so a low-resolution buffer looks the same and costs little.
+    const resize = () => {
+      canvas.width = Math.ceil(window.innerWidth / 4);
+      canvas.height = Math.ceil(window.innerHeight / 4);
+      gl.viewport(0, 0, canvas.width, canvas.height);
     };
+    resize();
+    window.addEventListener('resize', resize);
 
-frame=requestAnimationFrame(draw);return()=>cancelAnimationFrame(frame);
-},[]);return <canvas className="sky" ref={ref} width={240} height={160} aria-hidden="true"/>}
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let shown = target.current;
+    let last = performance.now();
+    let frame = 0;
+
+    const draw = (now: number) => {
+      frame = requestAnimationFrame(draw);
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+
+      // Ease toward the selected hour along the shorter way around the clock.
+      const diff = ((target.current - shown + 36) % 24) - 12;
+      shown = reduced.matches ? target.current : (shown + diff * Math.min(1, dt * 8) + 24) % 24;
+
+      const p = palette(shown);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, reduced.matches ? 0 : now / 1000);
+      gl.uniform3fv(uTop, p.top);
+      gl.uniform3fv(uHor, p.hor);
+      gl.uniform3fv(uLit, p.lit);
+      gl.uniform3fv(uSh, p.sh);
+      gl.uniform1f(uFog, p.fog);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    frame = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  return <canvas className="sky" ref={ref} aria-hidden="true" />;
+}
