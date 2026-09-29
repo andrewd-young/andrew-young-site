@@ -14,7 +14,7 @@ type Job = {
 const jobs: Job[] = [
   {
     name: 'Notability',
-    logo: '/notability.svg',
+    logo: '/logos/notability.jpg',
     role: 'Software Engineering Co-op',
     years: '2026 — Now',
     city: 'San Francisco',
@@ -28,7 +28,7 @@ const jobs: Job[] = [
   },
   {
     name: 'Strella',
-    logo: '/strella.avif',
+    logo: '/logos/strella.jpg',
     role: 'Software Engineer Co-op',
     years: '2025',
     city: 'New York (remote)',
@@ -42,7 +42,7 @@ const jobs: Job[] = [
   },
   {
     name: 'Lola',
-    logo: '/lola.jpeg',
+    logo: '/logos/lola.jpg',
     role: 'Software Engineer Intern',
     years: '2024',
     city: 'Concord, MA',
@@ -84,6 +84,7 @@ export default function App() {
   const [now, setNow] = useState(sfMinutes);
   const [manual, setManual] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(sfMinutes()), 15000);
@@ -94,6 +95,7 @@ export default function App() {
   const hour = minutes / 60;
   const light = hour >= 7.5 && hour < 18;
   const phase = phaseFor(hour);
+  const previewed = hovered ?? open;
 
   return (
     <div className={`site ${light ? 'day' : 'night'}`}>
@@ -131,38 +133,55 @@ export default function App() {
             <h2 id="experience">EXPERIENCE</h2>
             <span>2024 — NOW</span>
           </div>
-          <div className="table-head" aria-hidden="true">
-            <span>COMPANY</span>
-            <span>ROLE</span>
-            <span>YEARS</span>
-            <span>CITY</span>
-            <span />
-          </div>
-          {jobs.map((job, i) => (
-            <article className={`job ${open === i ? 'expanded' : ''}`} key={job.name}>
-              <button
-                className="job-row"
-                onClick={() => setOpen(open === i ? null : i)}
-                aria-expanded={open === i}
-                aria-controls={`job-${i}`}
-              >
-                <span className="company">
-                  <span className="logo"><img src={job.logo} alt="" /></span>
-                  <span>{job.name}</span>
-                </span>
-                <span className="job-role">{job.role}</span>
-                <span className="job-years">{job.years}</span>
-                <span className="job-city">{job.city}</span>
-                <span className="expand" aria-hidden="true">{open === i ? '−' : '+'}</span>
-              </button>
-              <div id={`job-${i}`} hidden={open !== i} className="job-detail">
-                <p className="meta">{job.tags}</p>
-                <ul>
-                  {job.bullets.map((b) => <li key={b}>{b}</li>)}
-                </ul>
+          <div className="work">
+            <div className="rows" onMouseLeave={() => setHovered(null)}>
+              <div className="table-head" aria-hidden="true">
+                <span>COMPANY</span>
+                <span>ROLE</span>
+                <span>YEARS</span>
+                <span>CITY</span>
+                <span />
               </div>
-            </article>
-          ))}
+              {jobs.map((job, i) => (
+                <article className={`job ${open === i ? 'expanded' : ''}`} key={job.name}>
+                  <button
+                    className="job-row"
+                    onClick={() => setOpen(open === i ? null : i)}
+                    onMouseEnter={() => setHovered(i)}
+                    onFocus={() => setHovered(i)}
+                    onBlur={() => setHovered(null)}
+                    aria-expanded={open === i}
+                    aria-controls={`job-${i}`}
+                  >
+                    <span className="company">{job.name}</span>
+                    <span className="job-role">{job.role}</span>
+                    <span className="job-years">{job.years}</span>
+                    <span className="job-city">{job.city}</span>
+                    <span className="expand" aria-hidden="true">{open === i ? '−' : '+'}</span>
+                  </button>
+                  <div id={`job-${i}`} hidden={open !== i} className="job-detail">
+                    <img className="detail-image" src={job.logo} alt="" />
+                    <p className="meta">{job.tags}</p>
+                    <ul>
+                      {job.bullets.map((b) => <li key={b}>{b}</li>)}
+                    </ul>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <aside className={`preview ${previewed === null ? '' : 'visible'}`} aria-hidden="true">
+              <div className="preview-label">
+                <span>{String((previewed ?? 0) + 1).padStart(2, '0')}</span>
+                <span>{jobs[previewed ?? 0].name.toUpperCase()}</span>
+              </div>
+              <div className="preview-frame">
+                {jobs.map((job, i) => (
+                  <img key={job.name} src={job.logo} alt="" className={previewed === i ? 'shown' : ''} />
+                ))}
+              </div>
+              <p className="meta">{jobs[previewed ?? 0].tags}</p>
+            </aside>
+          </div>
         </section>
       </main>
 
