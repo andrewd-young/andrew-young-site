@@ -146,7 +146,6 @@ export default function App() {
         <section className="experience" aria-labelledby="experience">
           <div className="section-label">
             <h2 id="experience">EXPERIENCE</h2>
-            <span>2024 — NOW</span>
           </div>
           <div className="work">
             <div className="rows" onMouseLeave={() => setHovered(null)}>

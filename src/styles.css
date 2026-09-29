@@ -186,17 +186,11 @@ nav {
 
 /* Experience */
 .section-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 26px;
 }
 .section-label h2 {
   font: inherit;
   margin: 0;
-}
-.section-label > span {
-  color: var(--muted);
 }
 .table-head,
 .job-row {
