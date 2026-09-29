@@ -1,4 +1,3 @@
-'use client';
 import {useEffect,useRef} from 'react';
 const keys: [number,string,string,string,string,number][] = [
     [0, '#03060c', '#0c1626', '#27303f', '#080c14', .45],

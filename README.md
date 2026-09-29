@@ -1,6 +1,6 @@
 # Andrew Young — personal site
 
-React 19 + TypeScript, using the Next.js App Router API with Vinext/Vite. Semantic HTML and custom CSS; no UI framework is required by the page.
+A single-page site built with React, TypeScript, and Vite.
 
 ## Develop
 
@@ -9,15 +9,11 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed in the terminal. To check types, run `npx tsc --noEmit`. To build, run `npm run build`.
+`npm run build` type-checks and writes a static site to `dist/`.
 
 ## Edit
 
-- `app/page.tsx`: résumé content, links, expandable experience, sky controls.
-- `app/sky.tsx`: animated sky adapted from the supplied SF Sky concept.
-- `app/globals.css`: responsive layout and locally hosted Instrument Serif / DM Sans fonts.
-- `public/`: company logos, fonts, favicon, and résumé PDF.
-
-The default sky follows `America/Los_Angeles` time, including daylight saving. The slider previews any time of day; Live restores the current time. Fog is a visual simulation, not live weather. Reduced-motion preferences stop cloud movement.
-
-Company logo sources: https://notability.com/static/nb-logo-full.svg ; https://strella.io ; https://linktr.ee/lola_dates . Résumé facts come from the supplied Andrew_Young_Resume.pdf.
+- `src/App.tsx`: page content, links, experience rows, sky control.
+- `src/sky.tsx`: animated San Francisco sky.
+- `src/styles.css`: layout and fonts.
+- `public/`: logos, fonts, favicon, and résumé PDF.
