@@ -65,7 +65,10 @@ void main() {
 export function Sky({ hour }: { hour: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const target = useRef(hour);
-  target.current = hour;
+
+  useEffect(() => {
+    target.current = hour;
+  }, [hour]);
 
   useEffect(() => {
     const canvas = ref.current!;
@@ -91,8 +94,15 @@ export function Sky({ hour }: { hour: number }) {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
     const u = (name: string) => gl.getUniformLocation(program, name);
-    const [uRes, uTime, uTop, uHor, uLit, uSh, uFog] =
-      ['res', 'time', 'top', 'hor', 'lit', 'sh', 'fog'].map(u);
+    const [uRes, uTime, uTop, uHor, uLit, uSh, uFog] = [
+      'res',
+      'time',
+      'top',
+      'hor',
+      'lit',
+      'sh',
+      'fog',
+    ].map(u);
 
     // The sky is blurred, so a low-resolution buffer looks the same and costs little.
     const resize = () => {

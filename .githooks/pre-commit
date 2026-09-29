@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks the commit if formatting, lint, or type checks fail.
+# To fix formatting, run: npm run format
+npm run check --silent

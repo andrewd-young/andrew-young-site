@@ -104,7 +104,9 @@ export default function App() {
       <div className="veil" />
       <main>
         <header className="masthead">
-          <a className="monogram" href="#top" aria-label="Andrew Young home">ay.</a>
+          <a className="monogram" href="#top" aria-label="Andrew Young home">
+            ay.
+          </a>
           <span className="location">
             SAN FRANCISCO <span className="clock">{timeLabel(now)} PT</span>
           </span>
@@ -113,7 +115,9 @@ export default function App() {
 
         <section id="top" className="hero" aria-labelledby="name">
           <p className="eyebrow">SOFTWARE ENGINEER</p>
-          <h1 id="name">Andrew Young<span className="period">.</span></h1>
+          <h1 id="name">
+            Andrew Young<span className="period">.</span>
+          </h1>
           <div className="intro">
             <p>
               Building the <a href="https://notability.com">Notability</a> desktop app.
@@ -122,9 +126,19 @@ export default function App() {
             </p>
             <nav aria-label="Contact">
               <a href="mailto:andrewy445@gmail.com">Email</a>
-              <a href="https://github.com/andrewd-young" target="_blank" rel="noreferrer">GitHub</a>
-              <a href="https://www.linkedin.com/in/andrew-young-99b2a220b" target="_blank" rel="noreferrer">LinkedIn</a>
-              <a href="/Andrew_Young_Resume.pdf" target="_blank" rel="noreferrer">Résumé</a>
+              <a href="https://github.com/andrewd-young" target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/andrew-young-99b2a220b"
+                target="_blank"
+                rel="noreferrer"
+              >
+                LinkedIn
+              </a>
+              <a href="/Andrew_Young_Resume.pdf" target="_blank" rel="noreferrer">
+                Résumé
+              </a>
             </nav>
           </div>
         </section>
@@ -158,13 +172,17 @@ export default function App() {
                     <span className="job-role">{job.role}</span>
                     <span className="job-years">{job.years}</span>
                     <span className="job-city">{job.city}</span>
-                    <span className="expand" aria-hidden="true">{open === i ? '−' : '+'}</span>
+                    <span className="expand" aria-hidden="true">
+                      {open === i ? '−' : '+'}
+                    </span>
                   </button>
                   <div id={`job-${i}`} hidden={open !== i} className="job-detail">
                     <img className="detail-image" src={job.logo} alt="" />
                     <p className="meta">{job.tags}</p>
                     <ul>
-                      {job.bullets.map((b) => <li key={b}>{b}</li>)}
+                      {job.bullets.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
                     </ul>
                   </div>
                 </article>
@@ -177,7 +195,12 @@ export default function App() {
               </div>
               <div className="preview-frame">
                 {jobs.map((job, i) => (
-                  <img key={job.name} src={job.logo} alt="" className={previewed === i ? 'shown' : ''} />
+                  <img
+                    key={job.name}
+                    src={job.logo}
+                    alt=""
+                    className={previewed === i ? 'shown' : ''}
+                  />
                 ))}
               </div>
               <p className="meta">{jobs[previewed ?? 0].tags}</p>
@@ -205,7 +228,8 @@ export default function App() {
               onClick={() => setManual(null)}
               aria-pressed={manual === null}
             >
-              <span />Live
+              <span />
+              Live
             </button>
           </div>
         )}
