@@ -86,7 +86,7 @@ a:hover {
   pointer-events: none;
 }
 .sky {
-  filter: blur(3px);
+  filter: blur(1px);
   transform: scale(1.025);
 }
 .veil {
