@@ -20,7 +20,7 @@ const jobs: Job[] = [
     role: 'Software Engineering Co-op',
     years: '2026 — Now',
     city: 'San Francisco',
-    tags: 'React · TypeScript · Electron · Redux',
+    tags: 'React · TypeScript · Redux · Electron',
     bullets: [
       'Built the meetings-first home screen for the Electron desktop launch. It now serves 25k+ weekly active users and accounts for nearly a third of desktop note creation, covered by 80+ automated tests.',
       'Shipped an upcoming-meetings card with six calendar connection states: 100k+ impressions, 15k+ users, and 1,000+ meeting notes started in its first month.',
@@ -34,7 +34,7 @@ const jobs: Job[] = [
     role: 'Software Engineer Co-op',
     years: '2025',
     city: 'New York (remote)',
-    tags: 'TypeScript · Video · HubSpot · Mixpanel',
+    tags: 'Next.js · TypeScript · Prisma · HubSpot · Mixpanel',
     bullets: [
       'Rebuilt the shared video player with draggable Picture-in-Picture, VTT subtitles, cached seek previews, and nested playback settings across web and mobile.',
       'Built the HubSpot integration end to end, including whitelist-based access control, sync debugging, in-app entry points, documentation, and a launch demo.',
