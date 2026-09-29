@@ -131,7 +131,6 @@ main {
   border-left: 1px solid var(--line);
   padding-left: 28px;
   color: var(--muted);
-  min-width: 115px;
 }
 
 /* Hero */
@@ -236,7 +235,8 @@ nav {
 .job-detail[hidden] {
   display: none;
 }
-.detail-image {
+.detail-image,
+.job-detail .meta {
   display: none;
 }
 .meta {
@@ -441,6 +441,9 @@ footer a {
   }
   .preview {
     display: none;
+  }
+  .job-detail .meta {
+    display: block;
   }
   .detail-image {
     display: block;

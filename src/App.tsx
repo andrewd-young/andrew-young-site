@@ -206,7 +206,7 @@ export default function App() {
             </div>
             <aside className={`preview ${previewed === null ? '' : 'visible'}`} aria-hidden="true">
               <div className="preview-label">
-                <span>{String((previewed ?? 0) + 1).padStart(2, '0')}</span>
+                <span>{String(jobs.length - (previewed ?? 0)).padStart(2, '0')}</span>
                 <span>{jobs[previewed ?? 0].name}</span>
               </div>
               <div className="preview-frame">
