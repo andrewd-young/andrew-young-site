@@ -262,6 +262,23 @@ nav {
   margin-bottom: 12px;
 }
 
+/* Footer */
+footer {
+  margin-top: 120px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+footer a {
+  color: var(--accent);
+}
+
 /* Hover preview: desktop only. Phones show the image inside the open row. */
 .work {
   display: grid;
@@ -412,6 +429,14 @@ nav {
 }
 
 @media (max-width: 760px) {
+  footer {
+    flex-wrap: wrap;
+    margin-top: 80px;
+  }
+  .sun {
+    order: 3;
+    width: 100%;
+  }
   main {
     padding: 0 6% 120px;
   }

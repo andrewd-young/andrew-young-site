@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sky } from './sky';
+import { nextSunEvent } from './sun';
 
 type Job = {
   name: string;
@@ -70,6 +71,12 @@ function timeLabel(n: number) {
   return `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
 }
 
+function durationLabel(minutes: number) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
 function phaseFor(hour: number) {
   if (hour < 5) return 'Night';
   if (hour < 7.5) return 'Dawn';
@@ -97,6 +104,8 @@ export default function App() {
   const light = hour >= 7.5 && hour < 18;
   const phase = phaseFor(hour);
   const previewed = hovered ?? open;
+  // `now` changes every 15 seconds, so this stays current.
+  const sun = nextSunEvent();
 
   return (
     <div className={`site ${light ? 'day' : 'night'}`}>
@@ -206,6 +215,19 @@ export default function App() {
             </aside>
           </div>
         </section>
+        <footer>
+          <span>© {new Date().getFullYear()} Andrew Young</span>
+          <span className="sun">
+            {sun.kind} in San Francisco in {durationLabel(sun.minutesAway)}
+          </span>
+          <a
+            href="https://github.com/andrewd-young/andrew-young-site"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Source
+          </a>
+        </footer>
       </main>
 
       <aside className={`sky-control ${controlOpen ? 'open' : ''}`} aria-label="Sky time">
