@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sky } from './sky';
 import { nextSunEvent } from './sun';
+import { useScrollAnchor } from './useScrollAnchor';
 
 type Job = {
   name: string;
@@ -94,6 +95,10 @@ export default function App() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [controlOpen, setControlOpen] = useState(false);
 
+  // Opening a row can close a taller row above it. Keep the tapped row in place so the
+  // new content expands downward.
+  const holdRow = useScrollAnchor(open);
+
   useEffect(() => {
     const timer = setInterval(() => setNow(sfMinutes()), 15000);
     return () => clearInterval(timer);
@@ -169,7 +174,10 @@ export default function App() {
                 <article className={`job ${open === i ? 'expanded' : ''}`} key={job.name}>
                   <button
                     className="job-row"
-                    onClick={() => setOpen(open === i ? null : i)}
+                    onClick={(e) => {
+                      holdRow(e.currentTarget);
+                      setOpen(open === i ? null : i);
+                    }}
                     onMouseEnter={() => setHovered(i)}
                     onFocus={() => setHovered(i)}
                     onBlur={() => setHovered(null)}
