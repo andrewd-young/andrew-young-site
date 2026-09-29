@@ -117,13 +117,13 @@ export default function App() {
             ay.
           </a>
           <span className="location">
-            SAN FRANCISCO <span className="clock">{timeLabel(now)} PT</span>
+            San Francisco <span className="clock">{timeLabel(now)} PT</span>
           </span>
           <span className="phase">{phase}</span>
         </header>
 
         <section id="top" className="hero" aria-labelledby="name">
-          <p className="eyebrow">SOFTWARE ENGINEER</p>
+          <p className="eyebrow">Software engineer</p>
           <h1 id="name">
             Andrew Young<span className="period">.</span>
           </h1>
@@ -154,15 +154,15 @@ export default function App() {
 
         <section className="experience" aria-labelledby="experience">
           <div className="section-label">
-            <h2 id="experience">EXPERIENCE</h2>
+            <h2 id="experience">Experience</h2>
           </div>
           <div className="work">
             <div className="rows" onMouseLeave={() => setHovered(null)}>
               <div className="table-head" aria-hidden="true">
-                <span>COMPANY</span>
-                <span>ROLE</span>
-                <span>YEARS</span>
-                <span>CITY</span>
+                <span>Company</span>
+                <span>Role</span>
+                <span>Years</span>
+                <span>City</span>
                 <span />
               </div>
               {jobs.map((job, i) => (
@@ -199,7 +199,7 @@ export default function App() {
             <aside className={`preview ${previewed === null ? '' : 'visible'}`} aria-hidden="true">
               <div className="preview-label">
                 <span>{String((previewed ?? 0) + 1).padStart(2, '0')}</span>
-                <span>{jobs[previewed ?? 0].name.toUpperCase()}</span>
+                <span>{jobs[previewed ?? 0].name}</span>
               </div>
               <div className="preview-frame">
                 {jobs.map((job, i) => (
