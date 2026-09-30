@@ -500,6 +500,7 @@ footer a {
   .sun {
     order: 3;
     width: 100%;
+    text-align: center;
   }
   .monogram {
     flex-shrink: 0;

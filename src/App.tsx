@@ -122,8 +122,21 @@ export default function App() {
   const holdRow = useScrollAnchor(open);
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(sfMinutes()), 15000);
-    return () => clearInterval(timer);
+    let timer: ReturnType<typeof setTimeout>;
+    const sync = () => {
+      clearTimeout(timer);
+      setNow(sfMinutes());
+      // Recalculate the delay each time so updates stay on the wall-clock minute.
+      timer = setTimeout(sync, 60000 - (Date.now() % 60000));
+    };
+    sync();
+    window.addEventListener('focus', sync);
+    document.addEventListener('visibilitychange', sync);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('focus', sync);
+      document.removeEventListener('visibilitychange', sync);
+    };
   }, []);
 
   const minutes = manual ?? now;
@@ -168,7 +181,10 @@ export default function App() {
                 />
                 <button
                   className={manual === null ? 'live active' : 'live'}
-                  onClick={() => setManual(null)}
+                  onClick={() => {
+                    setNow(sfMinutes());
+                    setManual(null);
+                  }}
                   aria-pressed={manual === null}
                 >
                   <span />
