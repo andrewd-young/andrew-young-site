@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sky } from './sky';
+import { Icon } from './icons';
 import { nextSunEvent } from './sun';
 import { useScrollAnchor } from './useScrollAnchor';
 
@@ -94,6 +95,27 @@ export default function App() {
   const [open, setOpen] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const [controlOpen, setControlOpen] = useState(false);
+  const controlRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!controlOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!controlRef.current?.contains(event.target as Node)) setControlOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setControlOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', dismiss);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [controlOpen]);
 
   // Opening a row can close a taller row above it. Keep the tapped row in place so the
   // new content expands downward.
@@ -109,7 +131,6 @@ export default function App() {
   const light = hour >= 7.5 && hour < 18;
   const phase = phaseFor(hour);
   const previewed = hovered ?? open;
-  // `now` changes every 15 seconds, so this stays current.
   const sun = nextSunEvent();
 
   return (
@@ -121,10 +142,52 @@ export default function App() {
           <a className="monogram" href="#top" aria-label="Andrew Young home">
             ay.
           </a>
-          <span className="location">
-            San Francisco <span className="clock">{timeLabel(now)} PT</span>
-          </span>
-          <span className="phase">{phase}</span>
+          <aside
+            className={`sky-control ${controlOpen ? 'open' : ''}`}
+            ref={controlRef}
+            aria-label="Sky time"
+          >
+            {controlOpen && (
+              <div id="sky-panel" className="range-row">
+                <input
+                  id="sky-hour"
+                  type="range"
+                  min="0"
+                  max="1439"
+                  step="1"
+                  value={minutes}
+                  // Follow the thumb center, including its larger invisible touch area.
+                  style={
+                    {
+                      '--fill': `calc(var(--thumb-size) / 2 + (100% - var(--thumb-size)) * ${minutes / 1439})`,
+                    } as React.CSSProperties
+                  }
+                  onChange={(e) => setManual(Number(e.target.value))}
+                  aria-label="Time of day"
+                  aria-valuetext={`${timeLabel(minutes)}, ${phase}`}
+                />
+                <button
+                  className={manual === null ? 'live active' : 'live'}
+                  onClick={() => setManual(null)}
+                  aria-pressed={manual === null}
+                >
+                  <span />
+                  Live
+                </button>
+              </div>
+            )}
+            <button
+              ref={toggleRef}
+              className="sky-toggle"
+              onClick={() => setControlOpen(!controlOpen)}
+              aria-expanded={controlOpen}
+              aria-controls="sky-panel"
+              aria-label={controlOpen ? 'Close sky time control' : 'Change sky time'}
+            >
+              <Icon name={light ? 'sun' : 'moon'} />
+              <output htmlFor="sky-hour">{timeLabel(minutes)} PT</output>
+            </button>
+          </aside>
         </header>
 
         <section id="top" className="hero" aria-labelledby="name">
@@ -151,7 +214,7 @@ export default function App() {
                 LinkedIn
               </a>
               <a href="/Andrew_Young_Resume.pdf" target="_blank" rel="noreferrer">
-                Résumé
+                Resume
               </a>
             </nav>
           </div>
@@ -193,13 +256,15 @@ export default function App() {
                     </span>
                   </button>
                   <div id={`job-${i}`} hidden={open !== i} className="job-detail">
-                    <img className="detail-image" src={job.logo} alt="" />
-                    <p className="meta">{job.tags}</p>
                     <ul>
                       {job.bullets.map((b) => (
                         <li key={b}>{b}</li>
                       ))}
                     </ul>
+                    <div className="detail-summary">
+                      <img className="detail-image" src={job.logo} alt="" />
+                      <p className="meta">{job.tags}</p>
+                    </div>
                   </div>
                 </article>
               ))}
@@ -224,58 +289,22 @@ export default function App() {
           </div>
         </section>
         <footer>
-          <span>© {new Date().getFullYear()} Andrew Young</span>
+          <span>Andrew Young · {new Date().getFullYear()}</span>
           <span className="sun">
             {sun.kind} in San Francisco in {durationLabel(sun.minutesAway)}
           </span>
+
           <a
+            className="source-link"
             href="https://github.com/andrewd-young/andrew-young-site"
             target="_blank"
             rel="noreferrer"
           >
+            <Icon name="tool" />
             Source
           </a>
         </footer>
       </main>
-
-      <aside className={`sky-control ${controlOpen ? 'open' : ''}`} aria-label="Sky time">
-        {controlOpen && (
-          <div className="range-row">
-            <input
-              id="sky-hour"
-              type="range"
-              min="0"
-              max="1439"
-              step="1"
-              value={minutes}
-              // The 16px thumb stops 8px from each end, so the fill follows its center.
-              style={
-                { '--fill': `calc(8px + (100% - 16px) * ${minutes / 1439})` } as React.CSSProperties
-              }
-              onChange={(e) => setManual(Number(e.target.value))}
-              aria-label="Time of day"
-              aria-valuetext={`${timeLabel(minutes)}, ${phase}`}
-            />
-            <button
-              className={manual === null ? 'live active' : 'live'}
-              onClick={() => setManual(null)}
-              aria-pressed={manual === null}
-            >
-              <span />
-              Live
-            </button>
-          </div>
-        )}
-        <button
-          className="sky-toggle"
-          onClick={() => setControlOpen(!controlOpen)}
-          aria-expanded={controlOpen}
-          aria-label={controlOpen ? 'Close sky time control' : 'Change sky time'}
-        >
-          <span aria-hidden="true">{light ? '☀' : '☾'}</span>
-          <output htmlFor="sky-hour">{timeLabel(minutes)}</output>
-        </button>
-      </aside>
     </div>
   );
 }

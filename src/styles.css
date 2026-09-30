@@ -30,7 +30,8 @@
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
+  /* Job toggles preserve their own scroll position; avoid a second browser correction. */
+  overflow-anchor: none;
 }
 body {
   margin: 0;
@@ -63,7 +64,7 @@ a:hover {
   --muted: #b9c0cb;
   --line: #ffffff33;
   --accent: #bfe3d6;
-  --glass: #101b2cbd;
+  --glass: #101b2c80;
   position: relative;
   min-height: 100vh;
   color: var(--ink);
@@ -74,7 +75,7 @@ a:hover {
   --muted: #334957;
   --line: #172b383d;
   --accent: #173e47;
-  --glass: #eef4f4d9;
+  --glass: #eef4f459;
 }
 
 .sky,
@@ -100,7 +101,7 @@ main {
   position: relative;
   max-width: 1600px;
   margin: auto;
-  padding: 0 5.5% 140px;
+  padding: 0 5.5% max(64px, env(safe-area-inset-bottom));
 }
 
 /* Masthead */
@@ -119,20 +120,6 @@ main {
   letter-spacing: -0.07em;
   text-transform: none;
 }
-.location {
-  margin-left: auto;
-}
-.clock {
-  margin-left: 18px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.phase {
-  border-left: 1px solid var(--line);
-  padding-left: 28px;
-  color: var(--muted);
-}
-
 /* Hero */
 .hero {
   padding: 69px 0 94px;
@@ -214,8 +201,10 @@ nav {
   font-size: 15px;
   transition: background 0.2s;
 }
-.job-row:hover {
-  background: color-mix(in srgb, var(--ink) 5%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .job-row:hover {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+  }
 }
 .company {
   font-family: var(--serif);
@@ -235,8 +224,7 @@ nav {
 .job-detail[hidden] {
   display: none;
 }
-.detail-image,
-.job-detail .meta {
+.detail-summary {
   display: none;
 }
 .meta {
@@ -267,6 +255,19 @@ footer {
 }
 footer a {
   color: var(--ink);
+}
+
+.icon {
+  display: block;
+  flex-shrink: 0;
+}
+.source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.source-link .icon {
+  color: var(--muted);
 }
 
 /* Hover preview: desktop only. Phones show the image inside the open row. */
@@ -301,7 +302,6 @@ footer a {
   aspect-ratio: 2 / 1;
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid var(--line);
 }
 .preview-frame img {
   position: absolute;
@@ -319,20 +319,22 @@ footer a {
   margin-top: 14px;
 }
 
-/* Sky control: a small corner button that opens a time slider.
-   One border on the pill, no shadows, no nested borders. The buttons get a light hover
-   background so they read as clickable; the slider has no hover state. */
+/* A lightly frosted header pill; the sky stays visible through the control. */
 .sky-control {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
+  --thumb-size: 16px;
+  --thumb-border: 0px;
+  position: relative;
+  margin-left: auto;
+  overflow: hidden;
+  clip-path: inset(0 round 999px);
   display: flex;
   align-items: center;
   gap: 4px;
   background: var(--glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 #ffffff26;
   border-radius: 999px;
   padding: 4px;
 }
@@ -348,20 +350,27 @@ footer a {
     color 0.2s,
     background 0.2s;
 }
-.sky-control button:hover {
-  background: color-mix(in srgb, var(--ink) 6%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .sky-control button:hover {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    color: var(--ink);
+  }
 }
-.sky-control button:hover,
 .sky-control .live.active {
   color: var(--ink);
 }
+.sky-control:has(:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 .sky-control :focus-visible {
-  outline-offset: 2px;
+  outline-offset: -2px;
   border-radius: 999px;
 }
 .sky-control .sky-toggle {
   gap: 8px;
-  padding: 6px 12px;
+  min-height: 36px;
+  padding: 8px 12px;
   color: var(--ink);
 }
 .sky-toggle output {
@@ -376,7 +385,7 @@ footer a {
 .live {
   gap: 6px;
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .live span {
   height: 5px;
@@ -391,7 +400,7 @@ footer a {
   -webkit-appearance: none;
   appearance: none;
   width: 200px;
-  height: 20px;
+  height: 36px;
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -413,19 +422,37 @@ footer a {
 }
 .range-row input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  margin-top: -5px;
-  border: 0;
+  box-sizing: border-box;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  margin-top: calc((6px - var(--thumb-size)) / 2);
+  border: var(--thumb-border) solid transparent;
   border-radius: 50%;
   background: var(--ink);
+  background-clip: padding-box;
 }
 .range-row input::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border: 0;
+  box-sizing: border-box;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border: var(--thumb-border) solid transparent;
   border-radius: 50%;
   background: var(--ink);
+  background-clip: padding-box;
+}
+
+@media (pointer: coarse) {
+  .sky-control {
+    --thumb-size: 44px;
+    --thumb-border: 12px;
+  }
+  .range-row input {
+    height: 44px;
+    touch-action: pan-y;
+  }
+  .sky-control button {
+    min-height: 44px;
+  }
 }
 
 @media (min-width: 1600px) {
@@ -442,13 +469,19 @@ footer a {
   .preview {
     display: none;
   }
-  .job-detail .meta {
+  .job-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 28%);
+    gap: 32px;
+    max-width: none;
+  }
+  .detail-summary {
     display: block;
   }
   .detail-image {
     display: block;
     width: 100%;
-    max-width: 480px;
+    max-width: 280px;
     aspect-ratio: 2 / 1;
     object-fit: cover;
     border-radius: 10px;
@@ -457,30 +490,54 @@ footer a {
 }
 
 @media (max-width: 760px) {
+  .sky-control {
+    --thumb-size: 44px;
+    --thumb-border: 12px;
+  }
   .monogram {
     font-size: 42px;
-  }
-  footer {
-    flex-wrap: wrap;
-    margin-top: 80px;
   }
   .sun {
     order: 3;
     width: 100%;
   }
+  .monogram {
+    flex-shrink: 0;
+  }
+  .sky-control.open {
+    flex: 1;
+    min-width: 0;
+  }
+  .sky-control.open .range-row {
+    flex: 1;
+    min-width: 0;
+    padding-left: 8px;
+  }
+  .sky-control.open .range-row input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    touch-action: pan-y;
+  }
+  .sky-control button {
+    flex-shrink: 0;
+    min-height: 44px;
+  }
+  .sky-control .sky-toggle {
+    padding: 8px;
+  }
+  footer {
+    flex-wrap: wrap;
+    margin-top: 80px;
+  }
   main {
-    padding: 0 6% 120px;
+    padding: 0 6% max(48px, env(safe-area-inset-bottom));
   }
   .masthead {
     height: 85px;
     gap: 15px;
     font-size: 12px;
-  }
-  .clock {
-    margin-left: 8px;
-  }
-  .phase {
-    display: none;
   }
   .hero {
     padding: 60px 0 65px;
@@ -538,25 +595,33 @@ footer a {
     grid-row: 1;
   }
   .job-detail {
+    display: block;
     padding: 5px 0 26px;
+  }
+  .detail-summary {
+    margin-top: 24px;
   }
   .job-detail ul {
     font-size: 14px;
     line-height: 1.7;
   }
-  .sky-control {
-    right: 16px;
-    bottom: 16px;
+}
+
+@media (max-width: 360px) {
+  .masthead {
+    position: relative;
   }
-  .range-row input {
-    width: min(200px, calc(100vw - 210px));
+  .masthead:has(.sky-control.open) .monogram {
+    visibility: hidden;
+  }
+  .sky-control.open {
+    position: absolute;
+    left: 0;
+    right: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   * {
     transition: none !important;
   }

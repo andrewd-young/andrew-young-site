@@ -102,6 +102,15 @@ void main() {
 }`;
 
 export function Sky({ hour }: { hour: number }) {
+  useEffect(() => {
+    // Match the browser chrome and overscroll area to the sky's horizon.
+    const color = `rgb(${palette(hour)
+      .hor.map((v) => Math.round(v * 255))
+      .join(' ')})`;
+    document.documentElement.style.backgroundColor = color;
+    document.body.style.backgroundColor = color;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
+  }, [hour]);
   const ref = useRef<HTMLCanvasElement>(null);
   const target = useRef(hour);
   const wake = useRef<() => void>(() => {});
