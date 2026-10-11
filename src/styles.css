@@ -17,6 +17,7 @@
   --radius-soft: 10px;
   --radius-pill: 999px;
   --radius-circle: 50%;
+  --icon-stroke: 1px;
   --serif: 'Instrument Serif', Georgia, serif;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-synthesis: none;
@@ -249,8 +250,9 @@ nav {
 footer {
   margin-top: 120px;
   padding-top: 24px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 24px;
   font-size: 14px;
   color: var(--muted);
@@ -258,18 +260,47 @@ footer {
 footer a {
   color: var(--ink);
 }
+.sun {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sun-horizon {
+  flex-shrink: 0;
+}
+.sky-scene {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.sky-scene.visible {
+  opacity: 1;
+}
+.sun-copy {
+  display: grid;
+  gap: 2px;
+  line-height: 1.4;
+}
+.sun-event {
+  color: var(--ink);
+}
+.sun-location {
+  font-size: 12px;
+}
 
 .icon {
   display: block;
   flex-shrink: 0;
+  color: var(--muted);
+}
+.icon :is(path, circle) {
+  stroke-width: var(--icon-stroke);
+  vector-effect: non-scaling-stroke;
 }
 .source-link {
+  justify-self: end;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-.source-link .icon {
-  color: var(--muted);
 }
 
 /* Hover preview: desktop only. Phones show the image inside the open row. */
@@ -498,8 +529,10 @@ footer a {
   }
   .sun {
     order: 3;
+    grid-column: 1 / -1;
     width: 100%;
-    text-align: center;
+    justify-content: center;
+    margin-top: 8px;
   }
   .monogram {
     flex-shrink: 0;
@@ -528,7 +561,7 @@ footer a {
     min-height: 44px;
   }
   footer {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr 1fr;
     margin-top: 80px;
   }
   main {

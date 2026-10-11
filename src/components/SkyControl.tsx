@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Icon } from '../icons';
+import { Icon, skyIcon } from '../icons';
 import { timeLabel } from '../time';
 import type { useSkyTime } from '../hooks/useSkyTime';
 
 type SkyControlProps = Omit<ReturnType<typeof useSkyTime>, 'hour'>;
 
-export function SkyControl({ minutes, light, phase, isLive, setManual, reset }: SkyControlProps) {
+export function SkyControl({ minutes, phase, isLive, setManual, reset }: SkyControlProps) {
   const [controlOpen, setControlOpen] = useState(false);
   const controlRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -68,7 +68,7 @@ export function SkyControl({ minutes, light, phase, isLive, setManual, reset }: 
         aria-controls="sky-panel"
         aria-label={controlOpen ? 'Close sky time control' : 'Change sky time'}
       >
-        <Icon name={light ? 'sun' : 'moon'} />
+        <Icon name={skyIcon(minutes / 60)} />
         <output htmlFor="sky-hour">{timeLabel(minutes)} PT</output>
       </button>
     </aside>

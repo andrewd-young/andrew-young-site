@@ -21,7 +21,7 @@ export default function App() {
         </header>
         <Hero />
         <Experience />
-        <Footer />
+        <Footer hour={skyTime.hour} />
       </main>
     </div>
   );

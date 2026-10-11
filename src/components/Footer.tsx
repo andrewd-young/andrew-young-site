@@ -1,14 +1,20 @@
-import { Icon } from '../icons';
+import { Icon, SkyIllustration } from '../icons';
 import { nextSunEvent } from '../sun';
 import { durationLabel } from '../time';
 
-export function Footer() {
+export function Footer({ hour }: { hour: number }) {
   const sun = nextSunEvent();
   return (
     <footer>
       <span>Andrew Young · {new Date().getFullYear()}</span>
       <span className="sun">
-        {sun.kind} in San Francisco in {durationLabel(sun.minutesAway)}
+        <SkyIllustration hour={hour} />
+        <span className="sun-copy">
+          <span className="sun-event">
+            {sun.kind} in {durationLabel(sun.minutesAway)}
+          </span>
+          <span className="sun-location">San Francisco</span>
+        </span>
       </span>
 
       <a
