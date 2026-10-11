@@ -1,10 +1,4 @@
 @font-face {
-  font-family: 'Geist';
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(/fonts/geist.woff2) format('woff2');
-}
-@font-face {
   font-family: 'Instrument Serif';
   font-weight: 400;
   font-display: swap;
@@ -21,7 +15,7 @@
 
 :root {
   --serif: 'Instrument Serif', Georgia, serif;
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-synthesis: none;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
@@ -184,25 +178,36 @@ nav {
 }
 .table-head {
   color: var(--muted);
-  padding: 0 0 15px;
+  padding: 0 16px 15px;
   border-bottom: 1px solid var(--line);
 }
 .job {
   border-bottom: 1px solid var(--line);
 }
 .job-row {
+  position: relative;
+  isolation: isolate;
   width: 100%;
   border: 0;
   background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
-  padding: 27px 0;
+  padding: 27px 16px;
   font-size: 15px;
+}
+/* Keep the highlight inside the row; padding gives the text breathing room. */
+.job-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 4px;
+  pointer-events: none;
   transition: background 0.2s;
 }
 @media (hover: hover) and (pointer: fine) {
-  .job-row:hover {
+  .job-row:hover::before {
     background: color-mix(in srgb, var(--ink) 5%, transparent);
   }
 }
@@ -575,7 +580,7 @@ footer a {
   .job-row {
     grid-template-columns: 1fr auto 24px;
     gap: 4px 12px;
-    padding: 23px 0;
+    padding: 23px 16px;
     font-size: 13px;
   }
   .company {

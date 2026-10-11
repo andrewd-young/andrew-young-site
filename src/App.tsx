@@ -19,7 +19,7 @@ const jobs: Job[] = [
     name: 'Notability',
     logo: '/logos/notability.jpg',
     role: 'Software Engineer Co-op',
-    years: '2026 — Now',
+    years: '2026 - Now',
     city: 'San Francisco',
     tags: 'React · TypeScript · Redux · Electron',
     bullets: [
