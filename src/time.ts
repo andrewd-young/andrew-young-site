@@ -1,10 +1,10 @@
-export function sfMinutes() {
+export function sfMinutes(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Los_Angeles',
     hour: '2-digit',
     minute: '2-digit',
     hourCycle: 'h23',
-  }).formatToParts(new Date());
+  }).formatToParts(date);
   const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
   return get('hour') * 60 + get('minute');
 }

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { sfMinutes, phaseFor } from '../time';
+import { solarPaletteHour } from '../sun';
 
 export function useSkyTime() {
-  const [now, setNow] = useState(sfMinutes);
+  const [now, setNow] = useState(() => new Date());
   const [manual, setManual] = useState<number | null>(null);
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     const sync = () => {
       clearTimeout(timer);
-      setNow(sfMinutes());
+      setNow(new Date());
       // Recalculate the delay each time so updates stay on the wall-clock minute.
       timer = setTimeout(sync, 60000 - (Date.now() % 60000));
     };
@@ -22,8 +23,8 @@ export function useSkyTime() {
     };
   }, []);
 
-  const minutes = manual ?? now;
-  const hour = minutes / 60;
+  const minutes = manual ?? sfMinutes(now);
+  const hour = solarPaletteHour(minutes, now);
   return {
     minutes,
     hour,
@@ -32,7 +33,7 @@ export function useSkyTime() {
     isLive: manual === null,
     setManual,
     reset: () => {
-      setNow(sfMinutes());
+      setNow(new Date());
       setManual(null);
     },
   };
