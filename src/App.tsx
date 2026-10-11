@@ -207,7 +207,6 @@ export default function App() {
         </header>
 
         <section id="top" className="hero" aria-labelledby="name">
-          <p className="eyebrow">Software engineer</p>
           <h1 id="name">
             Andrew Young<span className="period">.</span>
           </h1>
