@@ -14,6 +14,9 @@
 }
 
 :root {
+  --radius-soft: 10px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
   --serif: 'Instrument Serif', Georgia, serif;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-synthesis: none;
@@ -31,6 +34,12 @@ body {
   margin: 0;
   background: #0b1120;
 }
+/* Temporary room keeps a collapsed row in place near the end of the page. */
+body::after {
+  content: '';
+  display: block;
+  height: var(--scroll-reserve, 0px);
+}
 button {
   font: inherit;
 }
@@ -44,9 +53,14 @@ a {
   color: inherit;
   text-decoration: none;
 }
-a:hover {
-  text-decoration: underline;
-  text-underline-offset: 5px;
+.text-link {
+  border-bottom: 1px solid var(--line);
+}
+.text-link:hover,
+.text-link:focus-visible,
+.source-link:hover .text-link,
+.source-link:focus-visible .text-link {
+  border-bottom-color: currentColor;
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -118,7 +132,6 @@ main {
 .hero {
   padding: 69px 0 94px;
 }
-.section-label,
 .table-head,
 .preview-label,
 .meta {
@@ -146,9 +159,6 @@ h1 {
   line-height: 1.6;
   margin: 0;
 }
-.intro p a {
-  border-bottom: 1px solid var(--line);
-}
 nav {
   display: flex;
   gap: 30px;
@@ -157,13 +167,6 @@ nav {
 }
 
 /* Experience */
-.section-label {
-  margin-bottom: 26px;
-}
-.section-label h2 {
-  font: inherit;
-  margin: 0;
-}
 .table-head,
 .job-row {
   display: grid;
@@ -182,6 +185,7 @@ nav {
 .job-row {
   position: relative;
   isolation: isolate;
+  border-radius: 0;
   width: 100%;
   border: 0;
   background: transparent;
@@ -191,13 +195,12 @@ nav {
   padding: 27px 16px;
   font-size: 15px;
 }
-/* Keep the highlight inside the row; padding gives the text breathing room. */
+/* Keep the highlight flush with the dividers so the rows read as one table. */
 .job-row::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: 4px;
   pointer-events: none;
   transition: background 0.2s;
 }
@@ -246,7 +249,6 @@ nav {
 footer {
   margin-top: 120px;
   padding-top: 24px;
-  border-top: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   gap: 24px;
@@ -300,7 +302,7 @@ footer a {
 .preview-frame {
   position: relative;
   aspect-ratio: 2 / 1;
-  border-radius: 10px;
+  border-radius: var(--radius-soft);
   overflow: hidden;
 }
 .preview-frame img {
@@ -319,30 +321,29 @@ footer a {
   margin-top: 14px;
 }
 
-/* A lightly frosted header pill; the sky stays visible through the control. */
+/* Fully rounded controls with an even inset around each button. */
 .sky-control {
   --thumb-size: 16px;
   --thumb-border: 0px;
   position: relative;
   margin-left: auto;
-  overflow: hidden;
-  clip-path: inset(0 round 999px);
+  --control-inset: 5px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   background: var(--glass);
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
   border: 1px solid transparent;
   box-shadow: inset 0 1px 0 #ffffff26;
-  border-radius: 999px;
-  padding: 4px;
+  border-radius: var(--radius-pill);
+  padding: var(--control-inset);
 }
 .sky-control button {
   display: flex;
   align-items: center;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--muted);
   cursor: pointer;
@@ -365,7 +366,7 @@ footer a {
 }
 .sky-control :focus-visible {
   outline-offset: -2px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 .sky-control .sky-toggle {
   gap: 8px;
@@ -379,23 +380,24 @@ footer a {
 .range-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-left: 12px;
+  gap: 8px;
+  padding-left: 10px;
 }
 .live {
   gap: 6px;
-  padding: 6px 8px;
+  min-height: 36px;
+  padding: 8px 12px;
   font-size: 14px;
 }
 .live span {
   height: 5px;
   width: 5px;
   background: currentColor;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 }
 
 /* A plain slider: a 6px track filled up to the thumb, and no browser hover states.
-   App.tsx sets --fill to the thumb position. */
+   SkyControl sets --fill to the thumb position. */
 .range-row input {
   -webkit-appearance: none;
   appearance: none;
@@ -407,17 +409,17 @@ footer a {
 }
 .range-row input::-webkit-slider-runnable-track {
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(to right, var(--ink) var(--fill), var(--line) var(--fill));
 }
 .range-row input::-moz-range-track {
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-pill);
   background: var(--line);
 }
 .range-row input::-moz-range-progress {
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
 }
 .range-row input::-webkit-slider-thumb {
@@ -427,7 +429,7 @@ footer a {
   height: var(--thumb-size);
   margin-top: calc((6px - var(--thumb-size)) / 2);
   border: var(--thumb-border) solid transparent;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--ink);
   background-clip: padding-box;
 }
@@ -436,7 +438,7 @@ footer a {
   width: var(--thumb-size);
   height: var(--thumb-size);
   border: var(--thumb-border) solid transparent;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--ink);
   background-clip: padding-box;
 }
@@ -470,21 +472,18 @@ footer a {
     display: none;
   }
   .job-detail {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(200px, 28%);
-    gap: 32px;
     max-width: none;
   }
   .detail-summary {
     display: block;
+    margin-top: 24px;
   }
   .detail-image {
     display: block;
     width: 100%;
-    max-width: 280px;
     aspect-ratio: 2 / 1;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--radius-soft);
     margin-bottom: 18px;
   }
 }
@@ -505,28 +504,28 @@ footer a {
   .monogram {
     flex-shrink: 0;
   }
-  .sky-control.open {
+  .sky-control .range-row {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(320px, calc(100vw - 12vw));
+    padding: var(--control-inset) 8px var(--control-inset) 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--glass);
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  }
+  .sky-control .range-row input {
     flex: 1;
     min-width: 0;
-  }
-  .sky-control.open .range-row {
-    flex: 1;
-    min-width: 0;
-    padding-left: 8px;
-  }
-  .sky-control.open .range-row input {
-    flex: 1;
     width: 100%;
-    min-width: 0;
     height: 44px;
     touch-action: pan-y;
   }
   .sky-control button {
     flex-shrink: 0;
     min-height: 44px;
-  }
-  .sky-control .sky-toggle {
-    padding: 8px;
   }
   footer {
     flex-wrap: wrap;
@@ -558,12 +557,6 @@ footer a {
     gap: 22px;
     font-size: 14px;
     flex-wrap: wrap;
-  }
-  .section-label {
-    font-size: 13px;
-  }
-  .section-label {
-    margin-bottom: 18px;
   }
   .table-head {
     display: none;
@@ -602,26 +595,9 @@ footer a {
     display: block;
     padding: 5px 0 26px;
   }
-  .detail-summary {
-    margin-top: 24px;
-  }
   .job-detail ul {
     font-size: 14px;
     line-height: 1.7;
-  }
-}
-
-@media (max-width: 360px) {
-  .masthead {
-    position: relative;
-  }
-  .masthead:has(.sky-control.open) .monogram {
-    visibility: hidden;
-  }
-  .sky-control.open {
-    position: absolute;
-    left: 0;
-    right: 0;
   }
 }
 
